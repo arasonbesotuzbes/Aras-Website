@@ -1,11 +1,12 @@
 // Spotify — Backend proxy kullanıyor (gizli anahtarlar sunucuda)
+const API_URL = (typeof API_BASE !== 'undefined' ? API_BASE : '').replace(/\/+$/, '');
 let progressInterval;
 let updateInterval;
 
 // Süreyi formatlama
 function formatDuration(durationMs) {
     const minutes = Math.floor(durationMs / 60000);
-    const seconds = ((durationMs % 60000) / 1000).toFixed(0);
+    const seconds = Math.floor((durationMs % 60000) / 1000);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
@@ -20,7 +21,7 @@ function updateProgress(currentMs, totalMs) {
 // Spotify verilerini backend proxy üzerinden al
 async function getSpotifyData() {
     try {
-        const response = await fetch(`${API_BASE}/api/spotify`);
+        const response = await fetch(`${API_URL}/api/spotify`);
 
         if (!response.ok) throw new Error('Backend hatası');
 
@@ -149,7 +150,7 @@ async function loadProjects() {
     projectsGrid.innerHTML = '<div class="loading">Projeler yükleniyor...</div>';
 
     try {
-        const res = await fetch(`${API_BASE}/api/projects`);
+        const res = await fetch(`${API_URL}/api/projects`);
         if (!res.ok) throw new Error('API hatası');
         const projects = await res.json();
 
@@ -169,12 +170,12 @@ async function loadProjects() {
                 <h3 class="project-title">${project.name}</h3>
                 <div class="project-status">
                     <div class="status-dot ${project.status}"></div>
-                    <span class="status-text">${project.statusText}</span>
+                    <span class="status-text">${project.status_text}</span>
                 </div>
             </div>
-            <p class="project-description">${project.description}</p>
+            <p class="project-description">${project.description || ''}</p>
             <div class="project-tech">
-                ${project.technologies.map(tech => `<span class="tech-badge">${tech}</span>`).join('')}
+                ${(project.technologies || []).map(tech => `<span class="tech-badge">${tech}</span>`).join('')}
             </div>
             <div class="project-progress">
                 <div class="progress-label">
@@ -200,11 +201,11 @@ async function loadProjects() {
                 </div>
             </div>
             <div class="project-actions">
-                <a href="${project.githubLink}" class="action-btn secondary" target="_blank">
+                <a href="${project.github_link}" class="action-btn secondary" target="_blank">
                     <span class="btn-icon">📂</span>
                     <span>GitHub</span>
                 </a>
-                <a href="${project.demoLink}" class="action-btn primary" target="_blank">
+                <a href="${project.demo_link}" class="action-btn primary" target="_blank">
                     <span class="btn-icon">▶</span>
                     <span>Demo</span>
                 </a>
@@ -224,60 +225,7 @@ async function loadProjects() {
     }
 }
 
-// Oyunları yükleme
-// Oyunları yükleme
-function loadGames() {
-    const gamesList = document.querySelector('.games-list');
-
-    // Eğer mock oyunlar varsa onları göster, yoksa Steam oyunlarını yükle
-    if (mockGames && mockGames.length > 0) {
-        mockGames.forEach(game => {
-            const gameItem = document.createElement('div');
-            gameItem.className = 'game-item';
-
-            gameItem.innerHTML = `
-                <div class="game-cover">
-                    <img src="https://via.placeholder.com/300x200/333/00ff00?text=${encodeURIComponent(game.name)}" alt="${game.name}" class="game-image">
-                    <div class="game-overlay">
-                        <button class="play-btn">
-                            <span class="play-icon">▶</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="game-content">
-                    <div class="game-main-info">
-                        <h3 class="game-title">${game.name}</h3>
-                        <div class="game-rating">
-                            <span class="rating-score">${game.rating}</span>
-                            <span>★</span>
-                        </div>
-                    </div>
-                    <div class="game-status-section">
-                        <span class="status-badge status-${game.statusClass}">${game.status}</span>
-                        <div class="playtime-display">
-                            <span class="time-icon">⏱</span>
-                            <span>${game.playtime}</span>
-                        </div>
-                    </div>
-                    <div class="game-progress-section">
-                        <div class="progress-label">
-                            <span>Tamamlanma</span>
-                            <span>${game.completion}%</span>
-                        </div>
-                        <div class="progress-bar-bg">
-                            <div class="progress-bar-fill completion" style="width: ${game.completion}%"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            gamesList.appendChild(gameItem);
-        });
-    } else {
-        // Steam oyunlarını yükle
-        loadSteamGames();
-    }
-}
+// Oyunları yükleme (Sekmeye tıklandığında Steam oyunları yükleniyor)
 
 // Yetenekleri yükleme
 function loadSkills() {
@@ -380,7 +328,7 @@ async function loadBlogPosts() {
     blogPosts.innerHTML = '<div class="loading">Yazılar yükleniyor...</div>';
 
     try {
-        const res = await fetch(`${API_BASE}/api/blog`);
+        const res = await fetch(`${API_URL}/api/blog`);
         if (!res.ok) throw new Error('API hatası');
         allBlogPosts = await res.json();
 
@@ -405,14 +353,14 @@ async function loadBlogPosts() {
                     <h3 class="post-title">${post.title}</h3>
                     <div class="post-meta">
                         <span>${post.date}</span>
-                        <span>${post.readTime} okuma süresi</span>
+                        <span>${post.read_time} okuma süresi</span>
                         <span>Post #${post.id}</span>
                     </div>
                 </div>
             </div>
-            <p class="post-content">${post.content}</p>
+            <p class="post-content">${post.content || ''}</p>
             <div class="post-tags">
-                ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                ${(post.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
             </div>
             <div class="post-actions">
                 <button class="action-btn share-btn" data-post-id="${post.id}">
@@ -462,9 +410,9 @@ function openBlogModal(postId) {
     // Modal içeriğini doldur
     document.getElementById('modalPostTitle').textContent = post.title;
     document.getElementById('modalPostDate').textContent = post.date;
-    document.getElementById('modalPostReadTime').textContent = post.readTime + ' okuma süresi';
+    document.getElementById('modalPostReadTime').textContent = post.read_time + ' okuma süresi';
     document.getElementById('modalPostId').textContent = post.id;
-    document.getElementById('modalPostContent').innerHTML = post.fullContent;
+    document.getElementById('modalPostContent').innerHTML = post.full_content;
 
     // Etiketleri doldur
     const tagsContainer = document.getElementById('modalPostTags');
@@ -579,7 +527,7 @@ async function loadSteamGames() {
         if (entegrasyonYazisi) entegrasyonYazisi.style.display = 'none';
         gamesList.innerHTML = '<div class="loading">Steam oyunları yükleniyor...</div>';
 
-        const response = await fetch(`${API_BASE}/api/steam`);
+        const response = await fetch(`${API_URL}/api/steam`);
 
         if (!response.ok) throw new Error(`Backend yanıt vermedi: ${response.status}`);
 
@@ -727,7 +675,7 @@ async function loadGameAchievements(appId) {
     achievementsContainer.innerHTML = '<div class="loading">Başarımlar yükleniyor...</div>';
 
     try {
-        const response = await fetch(`${API_BASE}/api/steam/achievements/${appId}`);
+        const response = await fetch(`${API_URL}/api/steam/achievements/${appId}`);
 
         if (!response.ok) {
             throw new Error('Başarımlar yüklenemedi');
@@ -889,7 +837,6 @@ function showNotification(message, type = 'info') {
 document.addEventListener('DOMContentLoaded', function () {
     createMatrixEffect();
     loadProjects();
-    loadGames();
     loadSkills();
     loadBlogPosts();
     typeWriter();

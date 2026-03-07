@@ -369,6 +369,7 @@
                 <button class="tab-btn active" onclick="switchTab('blog')">📝 Blog</button>
                 <button class="tab-btn" onclick="switchTab('projects')">🚀 Projeler</button>
                 <button class="tab-btn" onclick="switchTab('skills')">✨ Yetenekler</button>
+                <button class="tab-btn" onclick="switchTab('settings')">⚙️ Ayarlar</button>
             </div>
 
             <!-- BLOG TAB -->
@@ -517,6 +518,47 @@
                     </div>
                 </div>
             </div>
+
+            <!-- AYARLAR TAB -->
+            <div class="tab-panel" id="tab-settings">
+                <div class="card">
+                    <h2>// PROFİL & VİTRİN AYARLARI</h2>
+                    <div class="form-group">
+                        <label>Dönen Profil Metinleri (Virgülle ayırın) *</label>
+                        <input type="text" id="settingTitles" placeholder="Aras, Bir Geliştirici, Bir Oyuncu" />
+                        <small style="color:var(--text-muted); display:block; margin-top:5px;">Örn: Aras, Full Stack
+                            Developer, Öğrenci</small>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="form-group">
+                            <label>Dönen Metin Fontu *</label>
+                            <select id="settingFont"
+                                style="width:100%; padding:12px; background:#111; color:#e0e0e0; border:1px solid #333; border-radius:8px;">
+                                <option value="JetBrains Mono">JetBrains Mono</option>
+                                <option value="Inter">Inter</option>
+                                <option value="'Courier New', monospace">Courier New</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                                <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                                <option value="'Times New Roman', serif">Times New Roman</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Logo (İsim) Fontu *</label>
+                            <select id="settingLogoFont"
+                                style="width:100%; padding:12px; background:#111; color:#e0e0e0; border:1px solid #333; border-radius:8px;">
+                                <option value="'Inter', sans-serif">Inter (Sade)</option>
+                                <option value="'JetBrains Mono', monospace">JetBrains Mono (Kod)</option>
+                                <option value="'Courier New', monospace">Courier New</option>
+                                <option value="'Press Start 2P', system-ui">Retro (8-bit)</option>
+                                <option value="'Dancing Script', cursive">El Yazısı</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btnSubmitSettings" onclick="submitSettings()">💾 Ayarları
+                        Kaydet</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -587,6 +629,7 @@
                 loadBlogPosts();
                 loadProjects();
                 loadSkills();
+                loadSettings();
             } catch (e) {
                 showNotify('API\'ye bağlanılamadı. URL\'yi kontrol edin.', 'error');
             }
@@ -882,13 +925,74 @@
         }
 
         // BİLDİRİM
-        function showNotify(msg, type) {
+        function showNotify(msg, type = 'success') {
             const el = document.getElementById('notify');
             el.textContent = msg;
-            el.className = `notify ${type} show`;
-            setTimeout(() => el.classList.remove('show'), 3000);
+            el.className = `notify ${type}`;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
         }
 
+        // SETTINGS (AYARLAR)
+        async function loadSettings() {
+            try {
+                const res = await fetch(`${API_URL}/api/settings`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.hero_titles) {
+                        document.getElementById('settingTitles').value = data.hero_titles.join(', ');
+                    }
+                    if (data && data.hero_font) {
+                        document.getElementById('settingFont').value = data.hero_font;
+                    }
+                    if (data && data.logo_font) {
+                        document.getElementById('settingLogoFont').value = data.logo_font;
+                    }
+                }
+            } catch (e) {
+                console.error("Ayarlar yuklenemedi", e);
+            }
+        }
+
+        async function submitSettings() {
+            const btn = document.getElementById('btnSubmitSettings');
+            btn.disabled = true;
+            btn.textContent = 'Kaydediliyor...';
+
+            const titlesRaw = document.getElementById('settingTitles').value;
+            const hero_font = document.getElementById('settingFont').value;
+            const logo_font = document.getElementById('settingLogoFont').value;
+
+            // Split by comma, trim whitespace, and filter empty strings
+            const hero_titles = titlesRaw.split(',').map(t => t.trim()).filter(t => t.length > 0);
+
+            if (hero_titles.length === 0) {
+                showNotify('Lütfen en az bir başlık girin.', 'error');
+                btn.disabled = false;
+                btn.textContent = '💾 Ayarları Kaydet';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/settings`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': ADMIN_PASS
+                    },
+                    body: JSON.stringify({ hero_titles, hero_font, logo_font })
+                });
+
+                if (!res.ok) throw new Error('Kayit sirasinda hata');
+
+                showNotify('Ayarlar başarıyla kaydedildi!');
+            } catch (e) {
+                showNotify('Hata: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Ayarları Kaydet';
+            }
+        }
         // ENTER ile giriş
         document.addEventListener('keydown', e => {
             if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') login();

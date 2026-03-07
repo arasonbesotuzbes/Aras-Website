@@ -34,14 +34,12 @@ CREATE POLICY "Enable delete for authenticated users only" ON public.skills FOR 
 
 -- 5. Insert Initial Mock Data
 INSERT INTO public.skills (name, category, category_icon, icon, percentage, level) VALUES
-('JavaScript', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-brands fa-js"></i>', 90, 'expert'),
-('Python', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-brands fa-python"></i>', 85, 'advanced'),
-('Java', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-brands fa-java"></i>', 75, 'intermediate'),
-('C#', 'Programming Languages', '<i class="fa-solid fa-code"></i>', 'C#', 70, 'intermediate'),
-('React', 'Frameworks & Libraries', '<i class="fa-solid fa-layer-group"></i>', '<i class="fa-brands fa-react"></i>', 85, 'advanced'),
-('Node.js', 'Frameworks & Libraries', '<i class="fa-solid fa-layer-group"></i>', '<i class="fa-brands fa-node-js"></i>', 80, 'advanced'),
-('Express.js', 'Frameworks & Libraries', '<i class="fa-solid fa-layer-group"></i>', '<i class="fa-solid fa-server"></i>', 80, 'advanced'),
-('Git', 'Tools & Technologies', '<i class="fa-solid fa-wrench"></i>', '<i class="fa-brands fa-git-alt"></i>', 90, 'expert'),
-('Docker', 'Tools & Technologies', '<i class="fa-solid fa-wrench"></i>', '<i class="fa-brands fa-docker"></i>', 70, 'intermediate'),
-('PostgreSQL', 'Databases', '<i class="fa-solid fa-database"></i>', '<i class="fa-solid fa-database"></i>', 80, 'advanced'),
-('MongoDB', 'Databases', '<i class="fa-solid fa-database"></i>', '<i class="fa-solid fa-leaf"></i>', 75, 'intermediate');
+('Lua', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-solid fa-moon"></i>', 80, 'advanced'),
+('Python', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-brands fa-python"></i>', 70, 'advanced'),
+('HTML', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-brands fa-html5"></i>', 80, 'advanced'),
+('CSS', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-brands fa-css3-alt"></i>', 30, 'beginner'),
+('JavaScript', 'Programming Languages', '<i class="fa-solid fa-code"></i>', '<i class="fa-brands fa-js"></i>', 15, 'beginner'),
+('Bash Scripting', 'Tools & Technologies', '<i class="fa-solid fa-wrench"></i>', '<i class="fa-solid fa-terminal"></i>', 40, 'intermediate'),
+('Kali Linux', 'Tools & Technologies', '<i class="fa-solid fa-wrench"></i>', '<i class="fa-brands fa-linux"></i>', 65, 'advanced'),
+('Arch Linux', 'Tools & Technologies', '<i class="fa-solid fa-wrench"></i>', '<i class="fa-brands fa-linux"></i>', 50, 'intermediate'),
+('VS Code', 'Tools & Technologies', '<i class="fa-solid fa-wrench"></i>', '<i class="fa-solid fa-file-code"></i>', 95, 'expert');

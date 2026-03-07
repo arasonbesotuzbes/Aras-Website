@@ -317,14 +317,38 @@ async function loadSkills() {
 
 
 // Yazı efekti
-function typeWriter() {
+async function typeWriter() {
     const textElement = document.querySelector('.typing-text');
-    const texts = [
+    let texts = [
         "Aras",
         "Bir Geliştirici",
         "Bir Oyuncu",
         "Bir Hayalperest"
     ];
+
+    try {
+        const res = await fetch(`${API_URL}/api/settings`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.hero_titles && data.hero_titles.length > 0) {
+                texts = data.hero_titles;
+            }
+            if (data.hero_font) {
+                textElement.style.fontFamily = data.hero_font;
+            }
+            if (data.logo_font) {
+                const logo = document.querySelector('.logo .glitch');
+                if (logo) {
+                    logo.style.fontFamily = data.logo_font;
+                    // Apply to pseudo-elements too by setting a CSS variable if needed, 
+                    // but usually direct style on parent with font-family: inherit in CSS is better.
+                    document.documentElement.style.setProperty('--logo-font', data.logo_font);
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Ayarlar yuklenemedi, varsayilan metinler kullaniliyor:", e);
+    }
     let textIndex = 0;
     let charIndex = 0;
     let isDeleting = false;

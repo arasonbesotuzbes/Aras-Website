@@ -1,12 +1,44 @@
 /* Reset ve temel stiller */
+:root {
+    --bg-color: #0a0a0a;
+    --card-bg: rgba(20, 20, 20, 0.85);
+    /* Slightly more opaque for better readability over matrix */
+    --primary-color: #00ff00;
+    --text-color: #ffffff;
+    --text-muted: #888888;
+    --accent-color: #00cc00;
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: var(--font-main);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--card-bg);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-main);
     background-color: #0a0a0a;
     color: #e0e0e0;
     line-height: 1.6;
@@ -64,6 +96,7 @@ body {
     color: #00ff00;
     text-shadow: 0 0 5px #00ff00;
     position: relative;
+    font-family: var(--logo-font, inherit);
 }
 
 .glitch::before,
@@ -284,11 +317,17 @@ body {
     font-size: 16px;
 }
 
-.nav-btn:hover,
-.nav-btn.active {
+.nav-btn:hover {
     background: #333;
     color: #00ff00;
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.nav-btn.active {
+    color: var(--primary-color);
+    background: rgba(0, 255, 0, 0.1);
+    border-bottom: 2px solid var(--primary-color);
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
 }
 
 /* Ana içerik alanı */
@@ -427,29 +466,34 @@ body {
     margin-top: 40px;
 }
 
+.social-links h3 {
+    margin-bottom: 20px;
+}
+
 .social-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
-    margin-top: 20px;
 }
 
 .social-link {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    background: #1a1a1a;
-    border-radius: 8px;
+    gap: 15px;
+    padding: 15px 20px;
+    background: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: var(--text-color);
     text-decoration: none;
-    color: #e0e0e0;
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
 }
 
 .social-link:hover {
-    background: #333;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 255, 0, 0.15);
 }
 
 .social-icon {
@@ -464,16 +508,20 @@ body {
 }
 
 .project-card {
-    background: #1a1a1a;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    background: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: 15px;
+    padding: 25px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
 }
 
 .project-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(0, 255, 0, 0.2);
+    border-color: var(--primary-color);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 255, 0, 0.15);
 }
 
 .project-header {
@@ -534,35 +582,48 @@ body {
 }
 
 .tech-badge {
-    background: #333;
     padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
+    background: rgba(0, 255, 0, 0.05);
+    /* Daha hafif arka plan */
+    color: var(--primary-color);
+    border-radius: 6px;
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    /* Font monospace yapıldı */
 }
 
 .project-progress {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .progress-label {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 5px;
-    font-size: 14px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    /* Daha profesyonel görünüm */
+    letter-spacing: 0.5px;
 }
 
 .progress-bar-bg {
+    width: 100%;
     height: 8px;
-    background: #333;
+    /* Kalınlık artırıldı */
+    background: #222;
     border-radius: 4px;
     overflow: hidden;
 }
 
 .progress-bar-fill {
     height: 100%;
-    background: #00ff00;
+    background: linear-gradient(90deg, #008000, var(--primary-color));
     border-radius: 4px;
-    transition: width 0.5s;
+    transition: width 1s ease-in-out;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+    /* Glow efekti */
 }
 
 .project-stats {
@@ -586,31 +647,49 @@ body {
 }
 
 .project-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    margin-top: auto;
 }
 
 .action-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 8px 15px;
-    border-radius: 5px;
+    justify-content: center;
+    gap: 6px;
     text-decoration: none;
-    font-size: 14px;
-    transition: all 0.3s;
-    border: none;
-    cursor: pointer;
+    font-family: var(--font-main);
 }
 
 .action-btn.primary {
-    background: #00ff00;
+    background: rgba(0, 255, 0, 0.15);
+    color: var(--primary-color);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.action-btn.primary:hover {
+    background: var(--primary-color);
     color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
 }
 
 .action-btn.secondary {
-    background: #333;
-    color: #e0e0e0;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .action-btn.donate {
@@ -635,15 +714,21 @@ body {
 }
 
 .game-item {
-    background: #1a1a1a;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--card-bg);
+    border: 1px solid #333;
+    padding: 15px;
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
 }
 
 .game-item:hover {
-    transform: translateY(-5px);
+    transform: translateX(5px) scale(1.01);
+    border-color: var(--primary-color);
+    box-shadow: -5px 5px 15px rgba(0, 255, 0, 0.15);
 }
 
 .game-cover {
@@ -792,15 +877,26 @@ body {
     box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
 }
 
-.category-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #00ff00;
-    border-bottom: 2px solid #333;
-    padding-bottom: 10px;
+.widget-title {
+    font-size: 1.1rem;
+    color: #1DB954;
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-bottom: 20px;
+    /* Added spacing from content */
+}
+
+.category-title {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    font-family: var(--font-mono);
 }
 
 .category-icon {
@@ -863,36 +959,40 @@ body {
 }
 
 .skill-progress-container {
-    margin-top: 8px;
+    margin-top: 15px;
 }
 
 .progress-info {
-    display: flex;
+    display: none;
+    /* Removed redundant percentage display below the bar */
     justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
     margin-bottom: 5px;
-    font-size: 12px;
-    color: #aaa;
 }
 
 .skill-progress-bg {
-    height: 10px;
-    background: #333;
-    border-radius: 5px;
+    width: 100%;
+    height: 8px;
+    /* Kalınlık artırıldı */
+    background: #222;
+    border-radius: 4px;
     overflow: hidden;
-    position: relative;
 }
 
 .skill-progress-fill {
     height: 100%;
-    border-radius: 5px;
-    background: linear-gradient(90deg, #00ff00, #00cc00);
+    border-radius: 4px;
+    background: linear-gradient(90deg, #008000, #00ff00);
     width: 0%;
     max-width: 100%;
     /* Prevent overflow beyond parent container during animation easing */
-    transition: width 1.5s ease-in-out;
+    transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+    /* Glow efekti */
 }
 
 .skill-progress-fill::after {
@@ -926,23 +1026,28 @@ body {
 }
 
 .level-beginner {
-    background: #ff4444;
-    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    color: #bbb;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .level-intermediate {
-    background: #ffaa00;
-    color: black;
+    background: rgba(0, 255, 255, 0.1);
+    color: #00ffff;
+    border: 1px solid rgba(0, 255, 255, 0.2);
 }
 
 .level-advanced {
-    background: #00ff00;
-    color: black;
+    background: rgba(0, 255, 0, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(0, 255, 0, 0.2);
 }
 
 .level-expert {
-    background: #00aaff;
-    color: white;
+    background: rgba(255, 0, 255, 0.1);
+    color: #ff00ff;
+    border: 1px solid rgba(255, 0, 255, 0.2);
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.3);
 }
 
 /* Kategori özel stilleri */
@@ -1061,11 +1166,20 @@ body {
     bottom: 20px;
     right: 20px;
     width: 300px;
-    background: #1a1a1a;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    background: var(--card-bg);
+    border: 1px solid #333;
+    border-radius: 16px;
+    /* Daha yumuşak kenarlar */
+    padding: 20px;
+    margin-top: 30px;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s ease;
     z-index: 100;
+}
+
+.spotify-widget:hover {
+    border-color: #1DB954;
+    /* Spotify green highlight */
 }
 
 .spotify-widget.active {
@@ -1114,9 +1228,12 @@ body {
 }
 
 .song-name {
-    font-size: 16px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    font-family: var(--font-mono);
+    /* Daha teknolojik bir his */
     margin-bottom: 5px;
-    color: #e0e0e0;
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -1126,8 +1243,8 @@ body {
 }
 
 .song-artist {
-    font-size: 14px;
-    color: #aaa;
+    color: var(--text-muted);
+    font-size: 0.9rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1266,21 +1383,23 @@ body {
 }
 
 .modal-content {
-    background-color: #1a1a1a;
-    margin: 2% auto;
-    padding: 0;
-    border-radius: 15px;
+    background: #111;
+    border: 1px solid var(--primary-color);
     width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
-    overflow-y: auto;
-    border: 1px solid #333;
-    box-shadow: 0 0 50px rgba(0, 255, 0, 0.3);
+    max-width: 800px;
+    max-height: 85vh;
+    /* Ekrana daha iyi sığması için */
+    border-radius: 15px;
+    padding: 30px;
     position: relative;
+    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+    margin: 2% auto;
 }
 
 .modal-header {
-    padding: 20px 30px;
+    padding: 20px 70px 20px 30px;
+    /* Increased right padding for close button */
     border-bottom: 1px solid #333;
     background: #1a1a1a;
     border-radius: 15px 15px 0 0;
@@ -1330,19 +1449,25 @@ body {
 .close-modal {
     position: absolute;
     right: 20px;
-    top: 20px;
+    top: 15px;
+    /* Slightly adjusted */
     background: #333;
     border: none;
     color: #aaa;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    /* Adjusted size */
+    height: 36px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
+    line-height: 1;
+    /* Fix vertical alignment */
+    z-index: 101;
+    /* Ensure it stays on top of sticky header */
 }
 
 .close-modal:hover {

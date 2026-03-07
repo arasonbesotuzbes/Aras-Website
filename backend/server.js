@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 // =============================================
 app.use(cors({
   origin: '*', // Deploy sonrasi kendi domain'inle degistir
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
@@ -467,7 +467,75 @@ app.delete('/api/skills/:id', async (req, res) => {
   }
 });
 
-// POST /api/stats/visit - Ziyareti kaydet
+// ==========================================
+// SETTINGS (AYARLAR) ENDPOINTLERI
+// ==========================================
+
+// GET /api/settings - Ayarlari al
+app.get('/api/settings', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('settings')
+      .eq('id', 1)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 is not found
+
+    // Default values if table is empty or column missing
+    const defaults = {
+      hero_titles: ["Aras", "Bir Geliştirici", "Bir Oyuncu", "Bir Hayalperest"],
+      hero_font: "JetBrains Mono",
+      logo_font: "'Inter', sans-serif"
+    };
+
+    if (!data) {
+      return res.json(defaults);
+    }
+
+    // Merge actual data with defaults for missing columns
+    res.json({
+      ...defaults,
+      ...data
+    });
+  } catch (error) {
+    console.error('[Settings GET]', error.message);
+    res.status(500).json({ error: 'Ayarlar alinamadi' });
+  }
+});
+
+// PUT /api/settings - Ayarlari guncelle (admin)
+app.put('/api/settings', async (req, res) => {
+  const adminPassword = req.headers['authorization'];
+  if (adminPassword !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Yetkisiz erişim' });
+  }
+
+  const { hero_titles, hero_font, logo_font } = req.body;
+  if (!hero_titles || !Array.isArray(hero_titles) || !hero_font || !logo_font) {
+    console.log('[Settings PUT] Eksik parametre:', { hero_titles, hero_font, logo_font });
+    return res.status(400).json({ error: 'Eksik veya hatali parametre' });
+  }
+
+  try {
+    console.log('[Settings PUT] Guncelleniyor:', { hero_titles, hero_font, logo_font });
+    const { data, error } = await supabase
+      .from('settings')
+      .upsert({ id: 1, hero_titles, hero_font, logo_font, updated_at: new Date() })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[Settings PUT] Supabase Hatasi:', error);
+      throw error;
+    }
+
+    console.log('[Settings PUT] Basarili:', data);
+    res.json(data);
+  } catch (error) {
+    console.error('[Settings PUT] Genel Hata:', error.message);
+    res.status(500).json({ error: 'Ayarlar guncellenemedi: ' + error.message });
+  }
+});
 app.post('/api/stats/visit', async (req, res) => {
   try {
     await supabase.rpc('increment_visits');

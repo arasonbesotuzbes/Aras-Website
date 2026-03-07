@@ -561,10 +561,8 @@ function displaySteamGames(games) {
         return;
     }
 
-    // En çok oynanan 12 oyunu göster
-    const displayedGames = games.slice(0, 12);
-
-    displayedGames.forEach(game => {
+    // Tüm oyunları göster
+    games.forEach(game => {
         const gameItem = document.createElement('div');
         gameItem.className = 'steam-game-item';
         gameItem.setAttribute('data-appid', game.appid);
@@ -583,7 +581,7 @@ function displaySteamGames(games) {
                      class="steam-game-image"
                      onerror="this.src='https://via.placeholder.com/300x120/333/00ff00?text=Görsel+Yüklenemedi'">
                 <div class="steam-game-overlay">
-                    <button class="view-details-btn">Detayları Gör</button>
+                     <button class="view-details-btn">Detayları Gör</button>
                 </div>
             </div>
             <div class="steam-game-content">
@@ -599,17 +597,6 @@ function displaySteamGames(games) {
 
         gamesList.appendChild(gameItem);
     });
-
-    // Daha fazla oyun varsa göster
-    if (games.length > 12) {
-        const moreGames = document.createElement('div');
-        moreGames.className = 'more-games-notice';
-        moreGames.innerHTML = `<p>+ ${games.length - 12} daha oyun...</p>`;
-        moreGames.style.textAlign = 'center';
-        moreGames.style.color = '#00ff00';
-        moreGames.style.marginTop = '20px';
-        gamesList.appendChild(moreGames);
-    }
 
     // Oyun item'larına tıklama event'i ekle
     document.querySelectorAll('.steam-game-item').forEach(item => {
@@ -683,13 +670,14 @@ async function loadGameAchievements(appId) {
 
         const data = await response.json();
 
-        if (data.playerstats && data.playerstats.success && data.playerstats.achievements) {
-            displayAchievements(data.playerstats.achievements, appId);
+        // Backend "{ achievements: [], message: ... }" veya "{ achievements: [...] }" döndürüyor
+        if (data && data.achievements && data.achievements.length > 0) {
+            displayAchievements(data.achievements, appId);
         } else {
             achievementsContainer.innerHTML = `
-                <div class="error">
-                    <p>Bu oyun için başarım bulunamadı</p>
-                    <p>Oyunun başarım sistemi olmayabilir veya başarımlar gizli olabilir</p>
+                <div class="error" style="text-align: center; padding: 20px;">
+                    <p style="color: #888; margin-bottom: 10px;">${data.message || 'Bu oyun için başarım bulunamadı'}</p>
+                    <p style="font-size: 0.9em; color: #555;">Oyunun başarım sistemi olmayabilir veya başarımlar gizli olabilir</p>
                 </div>
             `;
         }

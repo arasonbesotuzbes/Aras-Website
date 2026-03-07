@@ -119,9 +119,16 @@ app.get('/api/spotify/recent', async (req, res) => {
 // STEAM
 // =============================================
 
+let cachedSteamGames = null;
+let steamGamesExpiry = 0;
+
 // GET /api/steam - Sahip olunan oyunlar
 app.get('/api/steam', async (req, res) => {
   try {
+    if (cachedSteamGames && Date.now() < steamGamesExpiry) {
+      return res.json(cachedSteamGames);
+    }
+
     const apiUrl = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${process.env.STEAM_API_KEY}&steamid=${process.env.STEAM_ID}&format=json&include_appinfo=true&include_played_free_games=true`;
 
     const response = await fetch(apiUrl);
@@ -132,7 +139,13 @@ app.get('/api/steam', async (req, res) => {
       .filter(g => g.playtime_forever > 0)
       .sort((a, b) => b.playtime_forever - a.playtime_forever);
 
-    res.json({ games, total: games.length });
+    const resultData = { games, total: games.length };
+
+    // Cache for 10 minutes
+    cachedSteamGames = resultData;
+    steamGamesExpiry = Date.now() + 10 * 60 * 1000;
+
+    res.json(resultData);
 
   } catch (error) {
     console.error('[Steam]', error.message);

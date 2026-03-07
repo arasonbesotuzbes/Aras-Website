@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aras - Kişisel Portföy</title>
+    <link rel="stylesheet" href="style.css?v=3">
+</head>
+
+<body>
+    <div class="matrix-bg"></div>
+
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="glitch" data-text="ARAS">ARAS</span>
+                <span class="version">v2.0</span>
+            </div>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><button class="nav-btn active" onclick="switchTab('home')">Ben Kimim</button></li>
+                    <li><button class="nav-btn" onclick="switchTab('projects')">Projeler</button></li>
+                    <li><button class="nav-btn" onclick="switchTab('games')">Oyunlar</button></li>
+                    <li><button class="nav-btn" onclick="switchTab('tech')">Teknik Bilgi</button></li>
+                    <li><button class="nav-btn" onclick="switchTab('blog')">Günlük</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Ana Sayfa -->
+            <section id="home" class="tab-content active">
+                <div class="profile-section">
+                    <div class="profile-image-container">
+                        <img src="profil.png" alt="Aras" class="profile-image">
+                        <div class="profile-glow"></div>
+                    </div>
+                    <div class="profile-text">
+                        <h1 class="typing-text">Ben Kimim?</h1>
+                        <p class="intro-text">Kodlayan, oynayan, yaşayan. Sanal dünyanın içinde kaybolmuş bir
+                            geliştiriciyim. Burası benim dijital yuvam.</p>
+                        <div class="stats-quick">
+                            <div class="stat-item">
+                                <span class="stat-number">8+</span>
+                                <span class="stat-label">Proje</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">50k+</span>
+                                <span class="stat-label">Kod Satırı</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">4023h</span>
+                                <span class="stat-label">Oyun</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <h3>Bağlantılar</h3>
+                    <div class="social-grid">
+                        <a href="https://github.com/aras1535" target="_blank" class="social-link"
+                            onclick="playClickSound()">
+                            <span class="social-icon">😽</span>
+                            <span>GitHub</span>
+                        </a>
+                        <a href="https://x.com/aras1425" target="_blank" class="social-link" onclick="playClickSound()">
+                            <span class="social-icon">🐦</span>
+                            <span>X (Twitter)</span>
+                        </a>
+                        <a href="https://www.instagram.com/arasonbesotuzbes/" target="_blank" class="social-link"
+                            onclick="playClickSound()">
+                            <span class="social-icon">📷</span>
+                            <span>Instagram</span>
+                        </a>
+                        <a href="#" target="_blank" class="social-link" onclick="playClickSound()">
+                            <span class="social-icon">💬</span>
+                            <span>Discord</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projeler -->
+            <section id="projects" class="tab-content">
+                <h2 class="section-title">Projeler</h2>
+                <div class="section-subtitle">Kod dünyasındaki yaratımlarım ve katkılarım</div>
+                <div class="projects-grid"></div>
+            </section>
+
+            <!-- Oyunlar -->
+            <section id="games" class="tab-content">
+                <h2 class="section-title">Oyunlar</h2>
+                <div class="section-subtitle">Sanal dünyalarda geçirdiğim zamanlar</div>
+                <h2 class="Entegrasyonyazi">Yakında Steam Entegrasyonu Ekleyeceğim.</h2>
+                <div class="games-list"></div>
+            </section>
+
+            <!-- Teknik Bilgi -->
+            <section id="tech" class="tab-content">
+                <h2 class="section-title">Teknik Bilgi</h2>
+                <div class="section-subtitle">Yeteneklerim ve uzmanlık alanlarım</div>
+                <div class="skills-container"></div>
+            </section>
+
+            <!-- Blog -->
+            <section id="blog" class="tab-content">
+                <div class="blog-header">
+                    <div>
+                        <h2 class="section-title">Günlük</h2>
+                        <div class="section-subtitle">Düşüncelerim ve deneyimlerim</div>
+                    </div>
+                </div>
+                <div class="blog-posts"></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Spotify Widget -->
+    <div class="spotify-widget" id="spotifyWidget">
+        <div class="widget-header">
+            <span class="spotify-icon">♪</span>
+            <span>Şu Anda Dinleniyor</span>
+        </div>
+        <div class="spotify-error" id="spotifyError">Spotify bağlantısı kurulamadı</div>
+        <div class="spotify-content" id="spotifyContent">
+            <div class="song-info">
+                <img id="spotifyArtwork" src="" alt="Album Artwork" class="song-artwork">
+                <div class="song-details">
+                    <div class="song-name" id="spotifySong">Yükleniyor...</div>
+                    <div class="song-artist" id="spotifyArtist"></div>
+                </div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="spotifyProgress"></div>
+                </div>
+                <div class="time-info">
+                    <span id="spotifyCurrentTime">0:00</span>
+                    <span id="spotifyDuration">0:00</span>
+                </div>
+            </div>
+            <a href="#" class="listen-button" id="spotifyLink" target="_blank">Spotify'da Dinle</a>
+        </div>
+    </div>
+
+    <!-- Modal yapısını güncelle - Yorumlar kaldırıldı -->
+    <div id="blogModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalPostTitle">Başlık</h2>
+                <div class="modal-meta">
+                    <span id="modalPostDate">Tarih</span>
+                    <span id="modalPostReadTime">Okuma Süresi</span>
+                    <span>Post #<span id="modalPostId">0</span></span>
+                </div>
+                <div class="modal-tags" id="modalPostTags"></div>
+            </div>
+            <div class="modal-body" id="modalPostContent">
+                <!-- İçerik buraya gelecek -->
+            </div>
+            <div class="modal-actions">
+                <div class="post-actions">
+                    <button class="action-btn share-btn" id="modalShareBtn">
+                        <span class="btn-icon">↗️</span>
+                        <span>Paylaş</span>
+                    </button>
+                    <div class="share-options" id="shareOptions">
+                        <button class="share-option" data-platform="twitter">Twitter'da Paylaş</button>
+                        <button class="share-option" data-platform="linkedin">LinkedIn'de Paylaş</button>
+                        <button class="share-option" data-platform="copy">Linki Kopyala</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Steam Oyun Modal -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalGameTitle">Oyun Yükleniyor...</h2>
+                <div class="modal-meta">
+                    <span id="modalGamePlaytime">Oynama Süresi: 0s 0d</span>
+                    <span>Steam ID: <span id="modalGameAppId">0</span></span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="game-modal-content">
+                    <div class="game-header">
+                        <img id="modalGameImage" src="" alt="Oyun Görseli" class="game-modal-image">
+                        <div class="game-info">
+                            <h3 id="modalGameName">Oyun Adı</h3>
+                            <div class="game-stats">
+                                <div class="game-stat">
+                                    <span class="stat-label">Toplam Oynama</span>
+                                    <span class="stat-value" id="modalTotalPlaytime">0 saat</span>
+                                </div>
+                                <div class="game-stat">
+                                    <span class="stat-label">Son 2 Hafta</span>
+                                    <span class="stat-value" id="modalRecentPlaytime">0 saat</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="achievements-section">
+                        <h3>Başarımlar</h3>
+                        <div id="gameAchievements" class="achievements-container">
+                            <div class="loading">Başarımlar yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bildirimler -->
+    <div class="notification-container"></div>
+
+    <script src="data.js?v=4"></script>
+    <script src="script.js?v=4"></script>
+</body>
+
+</html>

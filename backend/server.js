@@ -224,6 +224,31 @@ app.post('/api/blog', async (req, res) => {
   }
 });
 
+// PUT /api/blog/:id - Yazi duzenle (admin)
+app.put('/api/blog/:id', async (req, res) => {
+  const { password, title, content, full_content, read_time, tags } = req.body;
+  const { id } = req.params;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Yetkisiz erisim' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .update({ title, content, full_content: full_content || content, read_time: read_time || '3 dk', tags: tags || [] })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    console.error('[Blog PUT]', error.message);
+    res.status(500).json({ error: 'Yazi guncellenemedi' });
+  }
+});
+
 // DELETE /api/blog/:id - Yazi sil (admin)
 app.delete('/api/blog/:id', async (req, res) => {
   const { password } = req.body;
@@ -294,6 +319,31 @@ app.post('/api/projects', async (req, res) => {
   }
 });
 
+// PUT /api/projects/:id - Proje duzenle (admin)
+app.put('/api/projects/:id', async (req, res) => {
+  const { password, ...projectData } = req.body;
+  const { id } = req.params;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Yetkisiz erisim' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .update(projectData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    console.error('[Projects PUT]', error.message);
+    res.status(500).json({ error: 'Proje guncellenemedi' });
+  }
+});
+
 // DELETE /api/projects/:id - Proje sil (admin)
 app.delete('/api/projects/:id', async (req, res) => {
   const { password } = req.body;
@@ -320,6 +370,102 @@ app.delete('/api/projects/:id', async (req, res) => {
 // =============================================
 // ISTATISTIK
 // =============================================
+
+// =============================================
+// YETENEKLER (SKILLS)
+// =============================================
+
+// GET /api/skills - Tum yetenekleri al
+app.get('/api/skills', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('skills')
+      .select('*')
+      .order('category', { ascending: true })
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    console.error('[Skills GET]', error.message);
+    res.status(500).json({ error: 'Yetenekler alinamadi' });
+  }
+});
+
+// POST /api/skills - Yeni yetenek ekle (admin)
+app.post('/api/skills', async (req, res) => {
+  const { password, ...skillData } = req.body;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Yetkisiz erisim' });
+  }
+
+  if (!skillData.name || !skillData.category) {
+    return res.status(400).json({ error: 'Yetenek adi ve kategori zorunlu' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('skills')
+      .insert([skillData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('[Skills POST]', error.message);
+    res.status(500).json({ error: 'Yetenek eklenemedi' });
+  }
+});
+
+// PUT /api/skills/:id - Yetenek guncelle (admin)
+app.put('/api/skills/:id', async (req, res) => {
+  const { password, ...skillData } = req.body;
+  const { id } = req.params;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Yetkisiz erisim' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('skills')
+      .update(skillData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    console.error('[Skills PUT]', error.message);
+    res.status(500).json({ error: 'Yetenek guncellenemedi' });
+  }
+});
+
+// DELETE /api/skills/:id - Yetenek sil (admin)
+app.delete('/api/skills/:id', async (req, res) => {
+  const { password } = req.body;
+  const { id } = req.params;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Yetkisiz erisim' });
+  }
+
+  try {
+    const { error } = await supabase
+      .from('skills')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    res.json({ message: 'Yetenek silindi' });
+  } catch (error) {
+    console.error('[Skills DELETE]', error.message);
+    res.status(500).json({ error: 'Yetenek silinemedi' });
+  }
+});
 
 // POST /api/stats/visit - Ziyareti kaydet
 app.post('/api/stats/visit', async (req, res) => {
@@ -363,10 +509,16 @@ app.get('/', (req, res) => {
       'GET /api/steam/achievements/:appid',
       'GET /api/blog',
       'POST /api/blog',
+      'PUT /api/blog/:id',
       'DELETE /api/blog/:id',
       'GET /api/projects',
       'POST /api/projects',
+      'PUT /api/projects/:id',
       'DELETE /api/projects/:id',
+      'GET /api/skills',
+      'POST /api/skills',
+      'PUT /api/skills/:id',
+      'DELETE /api/skills/:id',
       'GET /api/stats',
       'POST /api/stats/visit'
     ]

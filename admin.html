@@ -368,6 +368,7 @@
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('blog')">📝 Blog</button>
                 <button class="tab-btn" onclick="switchTab('projects')">🚀 Projeler</button>
+                <button class="tab-btn" onclick="switchTab('skills')">✨ Yetenekler</button>
             </div>
 
             <!-- BLOG TAB -->
@@ -396,7 +397,9 @@
                             <input type="text" id="blogTags" placeholder="Düşüncelerim, Kod, Oyun" />
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="addBlogPost()">✚ Yazıyı Ekle</button>
+                    <button class="btn btn-primary" id="btnSubmitBlog" onclick="submitBlog()">✚ Yazıyı Kaydet</button>
+                    <button class="btn btn-danger" id="btnCancelBlog" onclick="cancelEdit('blog')"
+                        style="display:none; margin-left:10px;">İptal</button>
                 </div>
 
                 <div class="card">
@@ -447,12 +450,69 @@
                             <input type="url" id="projDemo" placeholder="https://..." />
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="addProject()">✚ Projeyi Ekle</button>
+                    <button class="btn btn-primary" id="btnSubmitProject" onclick="submitProject()">✚ Projeyi
+                        Kaydet</button>
+                    <button class="btn btn-danger" id="btnCancelProject" onclick="cancelEdit('project')"
+                        style="display:none; margin-left:10px;">İptal</button>
                 </div>
 
                 <div class="card">
                     <h2>// MEVCUT PROJELER</h2>
                     <div class="item-list" id="projectList">
+                        <p style="color:#555;">Yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YETENEKLER TAB -->
+            <div class="tab-panel" id="tab-skills">
+                <div class="card">
+                    <h2 id="skillFormTitle">// YENİ YETENEK EKLE</h2>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="form-group" style="grid-column:span 2;">
+                            <label>Yetenek Adı *</label>
+                            <input type="text" id="skillName" placeholder="JavaScript, React, Python..." />
+                        </div>
+                        <div class="form-group">
+                            <label>Kategori *</label>
+                            <select id="skillCategory">
+                                <option value="Programming Languages">Programming Languages</option>
+                                <option value="Frameworks & Libraries">Frameworks & Libraries</option>
+                                <option value="Tools & Technologies">Tools & Technologies</option>
+                                <option value="Databases">Databases</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kategori İkonu (Emoji/FontAwesome)</label>
+                            <input type="text" id="skillCategoryIcon" placeholder='<i class="fa-solid fa-code"></i>' />
+                        </div>
+                        <div class="form-group">
+                            <label>Yetenek İkonu</label>
+                            <input type="text" id="skillIcon" placeholder='<i class="fa-brands fa-js"></i>' />
+                        </div>
+                        <div class="form-group">
+                            <label>Yüzde (0-100)</label>
+                            <input type="number" id="skillPercentage" placeholder="90" min="0" max="100" />
+                        </div>
+                        <div class="form-group">
+                            <label>Seviye</label>
+                            <select id="skillLevel">
+                                <option value="beginner">Başlangıç</option>
+                                <option value="intermediate">Orta</option>
+                                <option value="advanced">İleri</option>
+                                <option value="expert">Uzman</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="btnSubmitSkill" onclick="submitSkill()">✚ Yeteneği
+                        Kaydet</button>
+                    <button class="btn btn-danger" id="btnCancelSkill" onclick="cancelEdit('skill')"
+                        style="display:none; margin-left:10px;">İptal</button>
+                </div>
+
+                <div class="card">
+                    <h2>// MEVCUT YETENEKLER</h2>
+                    <div class="item-list" id="skillList">
                         <p style="color:#555;">Yükleniyor...</p>
                     </div>
                 </div>
@@ -471,6 +531,31 @@
             completed: 'Tamamlandı',
             testing: 'Test Aşamasında',
             planning: 'Planlama Aşamasında'
+        };
+
+        const levelLabels = {
+            beginner: 'Başlangıç',
+            intermediate: 'Orta',
+            advanced: 'İleri',
+            expert: 'Uzman'
+        };
+
+        let isEditing = {
+            blog: false,
+            project: false,
+            skill: false
+        };
+
+        let editId = {
+            blog: null,
+            project: null,
+            skill: null
+        };
+
+        let currentData = {
+            blog: [],
+            project: [],
+            skill: []
         };
 
         function togglePass() {
@@ -501,6 +586,7 @@
 
                 loadBlogPosts();
                 loadProjects();
+                loadSkills();
             } catch (e) {
                 showNotify('API\'ye bağlanılamadı. URL\'yi kontrol edin.', 'error');
             }
@@ -525,6 +611,7 @@
             try {
                 const res = await fetch(`${API_URL}/api/blog`);
                 const posts = await res.json();
+                currentData.blog = posts;
                 if (!posts.length) { list.innerHTML = '<p style="color:#555;">Henüz yazı yok.</p>'; return; }
                 list.innerHTML = posts.map(p => `
                 <div class="list-item">
@@ -532,13 +619,16 @@
                         <h3>${p.title}</h3>
                         <p>${new Date(p.created_at).toLocaleDateString('tr-TR')} &bull; ${p.read_time} &bull; ${(p.tags || []).join(', ')}</p>
                     </div>
-                    <button class="btn btn-danger" onclick="deleteBlog(${p.id})">Sil</button>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="editBlog(${p.id})">Düzenle</button>
+                        <button class="btn btn-danger" style="padding: 8px 16px; font-size: 0.8rem;" onclick="deleteBlog(${p.id})">Sil</button>
+                    </div>
                 </div>
             `).join('');
             } catch (e) { list.innerHTML = '<p style="color:red;">Yüklenemedi</p>'; }
         }
 
-        async function addBlogPost() {
+        async function submitBlog() {
             const title = document.getElementById('blogTitle').value.trim();
             const content = document.getElementById('blogContent').value.trim();
             const full_content = document.getElementById('blogFullContent').value.trim();
@@ -548,17 +638,38 @@
 
             if (!title || !content) { showNotify('Başlık ve özet zorunlu!', 'error'); return; }
 
+            const method = isEditing.blog ? 'PUT' : 'POST';
+            const endpoint = isEditing.blog ? `/api/blog/${editId.blog}` : '/api/blog';
+
             try {
-                const res = await fetch(`${API_URL}/api/blog`, {
-                    method: 'POST',
+                const res = await fetch(`${API_URL}${endpoint}`, {
+                    method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: ADMIN_PASS, title, content, full_content: full_content || content, read_time, tags })
                 });
                 if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
-                showNotify('Yazı eklendi!', 'success');
-                ['blogTitle', 'blogContent', 'blogFullContent', 'blogTags'].forEach(id => document.getElementById(id).value = '');
+                showNotify(isEditing.blog ? 'Yazı güncellendi!' : 'Yazı eklendi!', 'success');
+                cancelEdit('blog');
                 loadBlogPosts();
             } catch (e) { showNotify(e.message || 'Hata oluştu', 'error'); }
+        }
+
+        function editBlog(id) {
+            const post = currentData.blog.find(p => p.id === id);
+            if (!post) return;
+
+            isEditing.blog = true;
+            editId.blog = id;
+
+            document.getElementById('blogTitle').value = post.title;
+            document.getElementById('blogContent').value = post.content;
+            document.getElementById('blogFullContent').value = post.full_content || post.content;
+            document.getElementById('blogReadTime').value = post.read_time;
+            document.getElementById('blogTags').value = (post.tags || []).join(', ');
+
+            document.getElementById('btnSubmitBlog').innerHTML = '💾 Değişiklikleri Kaydet';
+            document.getElementById('btnCancelBlog').style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function deleteBlog(id) {
@@ -581,6 +692,7 @@
             try {
                 const res = await fetch(`${API_URL}/api/projects`);
                 const projects = await res.json();
+                currentData.project = projects;
                 if (!projects.length) { list.innerHTML = '<p style="color:#555;">Henüz proje yok.</p>'; return; }
                 list.innerHTML = projects.map(p => `
                 <div class="list-item">
@@ -588,13 +700,16 @@
                         <h3>${p.name}</h3>
                         <p>${statusLabels[p.status] || p.status} &bull; %${p.progress} &bull; ${(p.technologies || []).join(', ')}</p>
                     </div>
-                    <button class="btn btn-danger" onclick="deleteProject(${p.id})">Sil</button>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="editProject(${p.id})">Düzenle</button>
+                        <button class="btn btn-danger" style="padding: 8px 16px; font-size: 0.8rem;" onclick="deleteProject(${p.id})">Sil</button>
+                    </div>
                 </div>
             `).join('');
             } catch (e) { list.innerHTML = '<p style="color:red;">Yüklenemedi</p>'; }
         }
 
-        async function addProject() {
+        async function submitProject() {
             const name = document.getElementById('projName').value.trim();
             const description = document.getElementById('projDesc').value.trim();
             const techRaw = document.getElementById('projTech').value.trim();
@@ -607,17 +722,40 @@
 
             if (!name) { showNotify('Proje adı zorunlu!', 'error'); return; }
 
+            const method = isEditing.project ? 'PUT' : 'POST';
+            const endpoint = isEditing.project ? `/api/projects/${editId.project}` : '/api/projects';
+
             try {
-                const res = await fetch(`${API_URL}/api/projects`, {
-                    method: 'POST',
+                const res = await fetch(`${API_URL}${endpoint}`, {
+                    method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password: ADMIN_PASS, name, description, technologies, status, status_text, progress, github_link, demo_link })
                 });
                 if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
-                showNotify('Proje eklendi!', 'success');
-                ['projName', 'projDesc', 'projTech', 'projGithub', 'projDemo', 'projProgress'].forEach(id => document.getElementById(id).value = '');
+                showNotify(isEditing.project ? 'Proje güncellendi!' : 'Proje eklendi!', 'success');
+                cancelEdit('project');
                 loadProjects();
             } catch (e) { showNotify(e.message || 'Hata oluştu', 'error'); }
+        }
+
+        function editProject(id) {
+            const p = currentData.project.find(item => item.id === id);
+            if (!p) return;
+
+            isEditing.project = true;
+            editId.project = id;
+
+            document.getElementById('projName').value = p.name;
+            document.getElementById('projDesc').value = p.description || '';
+            document.getElementById('projTech').value = (p.technologies || []).join(', ');
+            document.getElementById('projStatus').value = p.status;
+            document.getElementById('projProgress').value = p.progress || 0;
+            document.getElementById('projGithub').value = p.github_link !== '#' ? p.github_link : '';
+            document.getElementById('projDemo').value = p.demo_link !== '#' ? p.demo_link : '';
+
+            document.getElementById('btnSubmitProject').innerHTML = '💾 Değişiklikleri Kaydet';
+            document.getElementById('btnCancelProject').style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function deleteProject(id) {
@@ -632,6 +770,115 @@
                 showNotify('Proje silindi.', 'success');
                 loadProjects();
             } catch (e) { showNotify('Silme başarısız!', 'error'); }
+        }
+
+        // YETENEKLER (SKILLS)
+        async function loadSkills() {
+            const list = document.getElementById('skillList');
+            try {
+                const res = await fetch(`${API_URL}/api/skills`);
+                const skills = await res.json();
+                currentData.skill = skills;
+                if (!skills.length) { list.innerHTML = '<p style="color:#555;">Henüz yetenek yok.</p>'; return; }
+                list.innerHTML = skills.map(s => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>${s.icon} ${s.name}</h3>
+                        <p>${s.category} &bull; %${s.percentage} &bull; ${levelLabels[s.level]}</p>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem;" onclick="editSkill(${s.id})">Düzenle</button>
+                        <button class="btn btn-danger" style="padding: 8px 16px; font-size: 0.8rem;" onclick="deleteSkill(${s.id})">Sil</button>
+                    </div>
+                </div>
+            `).join('');
+            } catch (e) { list.innerHTML = '<p style="color:red;">Yüklenemedi</p>'; }
+        }
+
+        async function submitSkill() {
+            const name = document.getElementById('skillName').value.trim();
+            const category = document.getElementById('skillCategory').value;
+            const category_icon = document.getElementById('skillCategoryIcon').value.trim();
+            const icon = document.getElementById('skillIcon').value.trim();
+            const percentage = parseInt(document.getElementById('skillPercentage').value) || 0;
+            const level = document.getElementById('skillLevel').value;
+
+            if (!name) { showNotify('Yetenek adı zorunlu!', 'error'); return; }
+
+            const method = isEditing.skill ? 'PUT' : 'POST';
+            const endpoint = isEditing.skill ? `/api/skills/${editId.skill}` : '/api/skills';
+
+            try {
+                const res = await fetch(`${API_URL}${endpoint}`, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: ADMIN_PASS, name, category, category_icon, icon, percentage, level })
+                });
+                if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
+                showNotify(isEditing.skill ? 'Yetenek güncellendi!' : 'Yetenek eklendi!', 'success');
+                cancelEdit('skill');
+                loadSkills();
+            } catch (e) { showNotify(e.message || 'Hata oluştu', 'error'); }
+        }
+
+        function editSkill(id) {
+            const s = currentData.skill.find(item => item.id === id);
+            if (!s) return;
+
+            isEditing.skill = true;
+            editId.skill = id;
+
+            document.getElementById('skillName').value = s.name;
+            document.getElementById('skillCategory').value = s.category;
+            document.getElementById('skillCategoryIcon').value = s.category_icon || '';
+            document.getElementById('skillIcon').value = s.icon || '';
+            document.getElementById('skillPercentage').value = s.percentage || 0;
+            document.getElementById('skillLevel').value = s.level || 'beginner';
+
+            document.getElementById('skillFormTitle').innerHTML = '// YETENEK DÜZENLE';
+            document.getElementById('btnSubmitSkill').innerHTML = '💾 Değişiklikleri Kaydet';
+            document.getElementById('btnCancelSkill').style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function deleteSkill(id) {
+            if (!confirm('Bu yeteneği silmek istediğinizden emin misiniz?')) return;
+            try {
+                const res = await fetch(`${API_URL}/api/skills/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: ADMIN_PASS })
+                });
+                if (!res.ok) throw new Error('Silinemedi');
+                showNotify('Yetenek silindi.', 'success');
+                loadSkills();
+            } catch (e) { showNotify('Silme başarısız!', 'error'); }
+        }
+
+        // FORMLARI SIFIRLAMA
+        function cancelEdit(type) {
+            isEditing[type] = false;
+            editId[type] = null;
+
+            if (type === 'blog') {
+                ['blogTitle', 'blogContent', 'blogFullContent', 'blogTags'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('blogReadTime').value = '3 dk';
+                document.getElementById('btnSubmitBlog').innerHTML = '✚ Yazıyı Ekle';
+                document.getElementById('btnCancelBlog').style.display = 'none';
+            } else if (type === 'project') {
+                ['projName', 'projDesc', 'projTech', 'projGithub', 'projDemo'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('projStatus').value = 'active';
+                document.getElementById('projProgress').value = '';
+                document.getElementById('btnSubmitProject').innerHTML = '✚ Projeyi Ekle';
+                document.getElementById('btnCancelProject').style.display = 'none';
+            } else if (type === 'skill') {
+                ['skillName', 'skillCategoryIcon', 'skillIcon', 'skillPercentage'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('skillCategory').value = 'Programming Languages';
+                document.getElementById('skillLevel').value = 'beginner';
+                document.getElementById('skillFormTitle').innerHTML = '// YENİ YETENEK EKLE';
+                document.getElementById('btnSubmitSkill').innerHTML = '✚ Yeteneği Kaydet';
+                document.getElementById('btnCancelSkill').style.display = 'none';
+            }
         }
 
         // BİLDİRİM

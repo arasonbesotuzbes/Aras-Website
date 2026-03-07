@@ -66,7 +66,8 @@ body {
     position: relative;
 }
 
-.glitch::before, .glitch::after {
+.glitch::before,
+.glitch::after {
     content: attr(data-text);
     position: absolute;
     top: 0;
@@ -90,51 +91,175 @@ body {
 }
 
 @keyframes glitch-anim {
-    0% { clip: rect(42px, 9999px, 44px, 0); }
-    5% { clip: rect(12px, 9999px, 59px, 0); }
-    10% { clip: rect(48px, 9999px, 29px, 0); }
-    15% { clip: rect(42px, 9999px, 73px, 0); }
-    20% { clip: rect(63px, 9999px, 27px, 0); }
-    25% { clip: rect(34px, 9999px, 55px, 0); }
-    30% { clip: rect(86px, 9999px, 73px, 0); }
-    35% { clip: rect(20px, 9999px, 20px, 0); }
-    40% { clip: rect(26px, 9999px, 60px, 0); }
-    45% { clip: rect(25px, 9999px, 66px, 0); }
-    50% { clip: rect(57px, 9999px, 98px, 0); }
-    55% { clip: rect(5px, 9999px, 46px, 0); }
-    60% { clip: rect(82px, 9999px, 31px, 0); }
-    65% { clip: rect(54px, 9999px, 27px, 0); }
-    70% { clip: rect(28px, 9999px, 99px, 0); }
-    75% { clip: rect(45px, 9999px, 69px, 0); }
-    80% { clip: rect(23px, 9999px, 85px, 0); }
-    85% { clip: rect(54px, 9999px, 84px, 0); }
-    90% { clip: rect(45px, 9999px, 47px, 0); }
-    95% { clip: rect(37px, 9999px, 20px, 0); }
-    100% { clip: rect(4px, 9999px, 91px, 0); }
+    0% {
+        clip: rect(42px, 9999px, 44px, 0);
+    }
+
+    5% {
+        clip: rect(12px, 9999px, 59px, 0);
+    }
+
+    10% {
+        clip: rect(48px, 9999px, 29px, 0);
+    }
+
+    15% {
+        clip: rect(42px, 9999px, 73px, 0);
+    }
+
+    20% {
+        clip: rect(63px, 9999px, 27px, 0);
+    }
+
+    25% {
+        clip: rect(34px, 9999px, 55px, 0);
+    }
+
+    30% {
+        clip: rect(86px, 9999px, 73px, 0);
+    }
+
+    35% {
+        clip: rect(20px, 9999px, 20px, 0);
+    }
+
+    40% {
+        clip: rect(26px, 9999px, 60px, 0);
+    }
+
+    45% {
+        clip: rect(25px, 9999px, 66px, 0);
+    }
+
+    50% {
+        clip: rect(57px, 9999px, 98px, 0);
+    }
+
+    55% {
+        clip: rect(5px, 9999px, 46px, 0);
+    }
+
+    60% {
+        clip: rect(82px, 9999px, 31px, 0);
+    }
+
+    65% {
+        clip: rect(54px, 9999px, 27px, 0);
+    }
+
+    70% {
+        clip: rect(28px, 9999px, 99px, 0);
+    }
+
+    75% {
+        clip: rect(45px, 9999px, 69px, 0);
+    }
+
+    80% {
+        clip: rect(23px, 9999px, 85px, 0);
+    }
+
+    85% {
+        clip: rect(54px, 9999px, 84px, 0);
+    }
+
+    90% {
+        clip: rect(45px, 9999px, 47px, 0);
+    }
+
+    95% {
+        clip: rect(37px, 9999px, 20px, 0);
+    }
+
+    100% {
+        clip: rect(4px, 9999px, 91px, 0);
+    }
 }
 
 @keyframes glitch-anim2 {
-    0% { clip: rect(65px, 9999px, 100px, 0); }
-    5% { clip: rect(52px, 9999px, 74px, 0); }
-    10% { clip: rect(79px, 9999px, 85px, 0); }
-    15% { clip: rect(75px, 9999px, 5px, 0); }
-    20% { clip: rect(67px, 9999px, 61px, 0); }
-    25% { clip: rect(14px, 9999px, 79px, 0); }
-    30% { clip: rect(1px, 9999px, 66px, 0); }
-    35% { clip: rect(86px, 9999px, 30px, 0); }
-    40% { clip: rect(23px, 9999px, 98px, 0); }
-    45% { clip: rect(85px, 9999px, 72px, 0); }
-    50% { clip: rect(71px, 9999px, 75px, 0); }
-    55% { clip: rect(2px, 9999px, 48px, 0); }
-    60% { clip: rect(30px, 9999px, 16px, 0); }
-    65% { clip: rect(59px, 9999px, 50px, 0); }
-    70% { clip: rect(41px, 9999px, 62px, 0); }
-    75% { clip: rect(2px, 9999px, 82px, 0); }
-    80% { clip: rect(47px, 9999px, 73px, 0); }
-    85% { clip: rect(3px, 9999px, 27px, 0); }
-    90% { clip: rect(26px, 9999px, 55px, 0); }
-    95% { clip: rect(42px, 9999px, 97px, 0); }
-    100% { clip: rect(38px, 9999px, 49px, 0); }
+    0% {
+        clip: rect(65px, 9999px, 100px, 0);
+    }
+
+    5% {
+        clip: rect(52px, 9999px, 74px, 0);
+    }
+
+    10% {
+        clip: rect(79px, 9999px, 85px, 0);
+    }
+
+    15% {
+        clip: rect(75px, 9999px, 5px, 0);
+    }
+
+    20% {
+        clip: rect(67px, 9999px, 61px, 0);
+    }
+
+    25% {
+        clip: rect(14px, 9999px, 79px, 0);
+    }
+
+    30% {
+        clip: rect(1px, 9999px, 66px, 0);
+    }
+
+    35% {
+        clip: rect(86px, 9999px, 30px, 0);
+    }
+
+    40% {
+        clip: rect(23px, 9999px, 98px, 0);
+    }
+
+    45% {
+        clip: rect(85px, 9999px, 72px, 0);
+    }
+
+    50% {
+        clip: rect(71px, 9999px, 75px, 0);
+    }
+
+    55% {
+        clip: rect(2px, 9999px, 48px, 0);
+    }
+
+    60% {
+        clip: rect(30px, 9999px, 16px, 0);
+    }
+
+    65% {
+        clip: rect(59px, 9999px, 50px, 0);
+    }
+
+    70% {
+        clip: rect(41px, 9999px, 62px, 0);
+    }
+
+    75% {
+        clip: rect(2px, 9999px, 82px, 0);
+    }
+
+    80% {
+        clip: rect(47px, 9999px, 73px, 0);
+    }
+
+    85% {
+        clip: rect(3px, 9999px, 27px, 0);
+    }
+
+    90% {
+        clip: rect(26px, 9999px, 55px, 0);
+    }
+
+    95% {
+        clip: rect(42px, 9999px, 97px, 0);
+    }
+
+    100% {
+        clip: rect(38px, 9999px, 49px, 0);
+    }
 }
 
 .version {
@@ -159,7 +284,8 @@ body {
     font-size: 16px;
 }
 
-.nav-btn:hover, .nav-btn.active {
+.nav-btn:hover,
+.nav-btn.active {
     background: #333;
     color: #00ff00;
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
@@ -181,8 +307,13 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .section-title {
@@ -235,9 +366,20 @@ body {
 }
 
 @keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.7; }
-    50% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.7; }
+    0% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
 }
 
 .profile-text {
@@ -745,9 +887,12 @@ body {
     border-radius: 5px;
     background: linear-gradient(90deg, #00ff00, #00cc00);
     width: 0%;
+    max-width: 100%;
+    /* Prevent overflow beyond parent container during animation easing */
     transition: width 1.5s ease-in-out;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .skill-progress-fill::after {
@@ -757,13 +902,18 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     animation: shimmer 2s infinite;
 }
 
 @keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
 }
 
 .skill-level {
@@ -775,33 +925,59 @@ body {
     margin-left: 10px;
 }
 
-.level-beginner { background: #ff4444; color: white; }
-.level-intermediate { background: #ffaa00; color: black; }
-.level-advanced { background: #00ff00; color: black; }
-.level-expert { background: #00aaff; color: white; }
+.level-beginner {
+    background: #ff4444;
+    color: white;
+}
+
+.level-intermediate {
+    background: #ffaa00;
+    color: black;
+}
+
+.level-advanced {
+    background: #00ff00;
+    color: black;
+}
+
+.level-expert {
+    background: #00aaff;
+    color: white;
+}
 
 /* Kategori özel stilleri */
-.category-programming .category-icon { color: #00ff00; }
-.category-frameworks .category-icon { color: #0099ff; }
-.category-tools .category-icon { color: #ff9900; }
-.category-databases .category-icon { color: #ff00ff; }
+.category-programming .category-icon {
+    color: #00ff00;
+}
+
+.category-frameworks .category-icon {
+    color: #0099ff;
+}
+
+.category-tools .category-icon {
+    color: #ff9900;
+}
+
+.category-databases .category-icon {
+    color: #ff00ff;
+}
 
 /* Responsive tasarım */
 @media (max-width: 768px) {
     .skill-category {
         padding: 20px 15px;
     }
-    
+
     .skill-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
-    
+
     .skill-info {
         width: 100%;
     }
-    
+
     .skill-percentage {
         align-self: flex-end;
     }
@@ -1064,7 +1240,8 @@ body {
         gap: 20px;
     }
 
-    .projects-grid, .games-list {
+    .projects-grid,
+    .games-list {
         grid-template-columns: 1fr;
     }
 
@@ -1480,17 +1657,17 @@ body {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .game-modal-image {
         width: 100%;
         max-width: 300px;
         height: 141px;
     }
-    
+
     .game-stats {
         grid-template-columns: 1fr;
     }
-    
+
     .achievements-container {
         grid-template-columns: 1fr;
     }

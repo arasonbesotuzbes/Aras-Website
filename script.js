@@ -188,29 +188,29 @@ async function loadProjects() {
             </div>
             <div class="project-stats">
                 <div class="stat">
-                    <span class="stat-icon">★</span>
+                    <span class="stat-icon"><i class="fa-solid fa-star"></i></span>
                     <span class="stat-value">${project.stars}</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-icon">⑂</span>
+                    <span class="stat-icon"><i class="fa-solid fa-code-fork"></i></span>
                     <span class="stat-value">${project.forks}</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-icon">!</span>
+                    <span class="stat-icon"><i class="fa-solid fa-circle-exclamation"></i></span>
                     <span class="stat-value">${project.issues}</span>
                 </div>
             </div>
             <div class="project-actions">
                 <a href="${project.github_link}" class="action-btn secondary" target="_blank">
-                    <span class="btn-icon">📂</span>
+                    <span class="btn-icon"><i class="fa-brands fa-github"></i></span>
                     <span>GitHub</span>
                 </a>
                 <a href="${project.demo_link}" class="action-btn primary" target="_blank">
-                    <span class="btn-icon">▶</span>
+                    <span class="btn-icon"><i class="fa-solid fa-play"></i></span>
                     <span>Demo</span>
                 </a>
                 <button class="action-btn donate">
-                    <span class="btn-icon">💖</span>
+                    <span class="btn-icon"><i class="fa-solid fa-heart"></i></span>
                     <span>Destekle</span>
                 </button>
             </div>
@@ -227,51 +227,92 @@ async function loadProjects() {
 
 // Oyunları yükleme (Sekmeye tıklandığında Steam oyunları yükleniyor)
 
-// Yetenekleri yükleme
-function loadSkills() {
+// Yetenekleri yükleme — Backend API'den
+async function loadSkills() {
     const skillsContainer = document.querySelector('.skills-container');
-    skillsContainer.innerHTML = '';
+    skillsContainer.innerHTML = '<div class="loading">Yetenekler yükleniyor...</div>';
 
-    mockSkills.forEach((category, index) => {
-        const skillCategory = document.createElement('div');
-        skillCategory.className = `skill-category category-${category.category.toLowerCase().split(' ')[0]}`;
+    try {
+        const res = await fetch(`${API_URL}/api/skills`);
+        if (!res.ok) throw new Error('API hatası');
+        const skillsList = await res.json();
 
-        skillCategory.innerHTML = `
-            <h3 class="category-title">
-                <span class="category-icon">${category.icon}</span>
-                ${category.category}
-            </h3>
-            <div class="skills-grid">
-                ${category.skills.map(skill => `
-                    <div class="skill-item">
-                        <div class="skill-header">
-                            <div class="skill-info">
-                                <div class="skill-icon">${skill.icon}</div>
-                                <div>
-                                    <span class="skill-name">${skill.name}</span>
-                                    <span class="skill-level level-${skill.level}">${levelLabels[skill.level]}</span>
+        skillsContainer.innerHTML = '';
+
+        if (!skillsList || skillsList.length === 0) {
+            skillsContainer.innerHTML = '<p style="color:#555;">Henüz yetenek eklenmedi.</p>';
+            return;
+        }
+
+        // Backend'den gelen düz veriyi kategorilere göre grupla
+        const categoriesMap = {};
+        skillsList.forEach(skill => {
+            if (!categoriesMap[skill.category]) {
+                categoriesMap[skill.category] = {
+                    category: skill.category,
+                    icon: skill.category_icon || '',
+                    skills: []
+                };
+            }
+            categoriesMap[skill.category].skills.push(skill);
+        });
+
+        const categories = Object.values(categoriesMap);
+
+        const levelLabels = {
+            beginner: 'Başlangıç',
+            intermediate: 'Orta',
+            advanced: 'İleri',
+            expert: 'Uzman'
+        };
+
+        categories.forEach((category) => {
+            const skillCategory = document.createElement('div');
+            // 'Programming Languages' -> 'programming' gibi CSS sınıfı uydurma
+            const safeClass = category.category.toLowerCase().replace(/[^a-z0-9]/g, '');
+            skillCategory.className = `skill-category category-${safeClass}`;
+
+            skillCategory.innerHTML = `
+                <h3 class="category-title">
+                    <span class="category-icon">${category.icon}</span>
+                    ${category.category}
+                </h3>
+                <div class="skills-grid">
+                    ${category.skills.map(skill => `
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <div class="skill-info">
+                                    <div class="skill-icon">${skill.icon}</div>
+                                    <div>
+                                        <span class="skill-name">${skill.name}</span>
+                                        <span class="skill-level level-${skill.level}">${levelLabels[skill.level] || skill.level}</span>
+                                    </div>
+                                </div>
+                                <span class="skill-percentage">${skill.percentage}%</span>
+                            </div>
+                            <div class="skill-progress-container">
+                                <div class="progress-info">
+                                    <span>Yeterlilik</span>
+                                    <span>${skill.percentage}%</span>
+                                </div>
+                                <div class="skill-progress-bg">
+                                    <div class="skill-progress-fill" data-width="${skill.percentage}"></div>
                                 </div>
                             </div>
-                            <span class="skill-percentage">${skill.percentage}%</span>
                         </div>
-                        <div class="skill-progress-container">
-                            <div class="progress-info">
-                                <span>Yeterlilik</span>
-                                <span>${skill.percentage}%</span>
-                            </div>
-                            <div class="skill-progress-bg">
-                                <div class="skill-progress-fill" data-width="${skill.percentage}"></div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+                    `).join('')}
+                </div>
+            `;
 
-        skillsContainer.appendChild(skillCategory);
-    });
+            skillsContainer.appendChild(skillCategory);
+        });
 
-    setTimeout(animateProgressBars, 300);
+        setTimeout(animateProgressBars, 300);
+
+    } catch (error) {
+        console.error('Yetenek yükleme hatası:', error);
+        skillsContainer.innerHTML = '<div class="error">Yetenekler yüklenemedi. Backend çalışıyor mu?</div>';
+    }
 }
 
 
@@ -364,7 +405,7 @@ async function loadBlogPosts() {
             </div>
             <div class="post-actions">
                 <button class="action-btn share-btn" data-post-id="${post.id}">
-                    <span class="btn-icon">↗️</span>
+                    <span class="btn-icon"><i class="fa-solid fa-share-nodes"></i></span>
                     <span>Paylaş</span>
                 </button>
             </div>
@@ -588,7 +629,7 @@ function displaySteamGames(games) {
                 <h3 class="steam-game-title" title="${game.name}">${game.name}</h3>
                 <div class="steam-game-stats">
                     <div class="playtime-display">
-                        <span class="time-icon">⏱</span>
+                        <span class="time-icon"><i class="fa-solid fa-clock"></i></span>
                         <span>${playtimeText}</span>
                     </div>
                 </div>

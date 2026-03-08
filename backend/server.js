@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
@@ -20,9 +20,17 @@ app.use(express.json());
 // =============================================
 // SUPABASE
 // =============================================
+// Public client (read-only, respects RLS)
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
+);
+
+// Admin client (bypasses RLS for write operations)
+// Requires SUPABASE_SERVICE_KEY in .env (service_role key from Supabase dashboard)
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY // Fallback to anon if no service key
 );
 
 // =============================================
@@ -67,7 +75,7 @@ app.get('/api/spotify', async (req, res) => {
     });
 
     if (response.status === 204) {
-      return res.json({ playing: false, message: 'Su anda muzik calmıyor' });
+      return res.json({ playing: false, message: 'Su anda muzik calmÄ±yor' });
     }
 
     if (!response.ok) {
@@ -210,7 +218,7 @@ app.post('/api/blog', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('blog_posts')
       .insert([{ title, content, full_content: full_content || content, read_time: read_time || '3 dk', tags: tags || [] }])
       .select()
@@ -234,9 +242,10 @@ app.put('/api/blog/:id', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const updateData = { title, content, full_content: full_content || content, read_time: read_time || '3 dk', tags: tags || [] };
+    const { data, error } = await supabaseAdmin
       .from('blog_posts')
-      .update({ title, content, full_content: full_content || content, read_time: read_time || '3 dk', tags: tags || [] })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
@@ -259,7 +268,7 @@ app.delete('/api/blog/:id', async (req, res) => {
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('blog_posts')
       .delete()
       .eq('id', id);
@@ -305,7 +314,7 @@ app.post('/api/projects', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('projects')
       .insert([projectData])
       .select()
@@ -329,9 +338,10 @@ app.put('/api/projects/:id', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { id: _, ...updateData } = projectData; // Remove id if present
+    const { data, error } = await supabaseAdmin
       .from('projects')
-      .update(projectData)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
@@ -354,7 +364,7 @@ app.delete('/api/projects/:id', async (req, res) => {
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('projects')
       .delete()
       .eq('id', id);
@@ -405,7 +415,7 @@ app.post('/api/skills', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('skills')
       .insert([skillData])
       .select()
@@ -429,9 +439,10 @@ app.put('/api/skills/:id', async (req, res) => {
   }
 
   try {
-    const { data, error } = await supabase
+    const { id: _, ...updateData } = skillData; // Remove id if present
+    const { data, error } = await supabaseAdmin
       .from('skills')
-      .update(skillData)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
@@ -454,7 +465,7 @@ app.delete('/api/skills/:id', async (req, res) => {
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('skills')
       .delete()
       .eq('id', id);
@@ -483,7 +494,7 @@ app.get('/api/settings', async (req, res) => {
 
     // Default values if table is empty or column missing
     const defaults = {
-      hero_titles: ["Aras", "Bir Geliştirici", "Bir Oyuncu", "Bir Hayalperest"],
+      hero_titles: ["Aras", "Bir GeliÅŸtirici", "Bir Oyuncu", "Bir Hayalperest"],
       hero_font: "JetBrains Mono",
       logo_font: "'Inter', sans-serif"
     };
@@ -507,7 +518,7 @@ app.get('/api/settings', async (req, res) => {
 app.put('/api/settings', async (req, res) => {
   const adminPassword = req.headers['authorization'];
   if (adminPassword !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Yetkisiz erişim' });
+    return res.status(401).json({ error: 'Yetkisiz eriÅŸim' });
   }
 
   const { hero_titles, hero_font, logo_font } = req.body;
@@ -518,7 +529,7 @@ app.put('/api/settings', async (req, res) => {
 
   try {
     console.log('[Settings PUT] Guncelleniyor:', { hero_titles, hero_font, logo_font });
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('settings')
       .upsert({ id: 1, hero_titles, hero_font, logo_font, updated_at: new Date() })
       .select()
@@ -536,6 +547,28 @@ app.put('/api/settings', async (req, res) => {
     res.status(500).json({ error: 'Ayarlar guncellenemedi: ' + error.message });
   }
 });
+// GET /api/diag - Veritabani tanilama (RLS kontrolu vs.)
+app.get('/api/diag', async (req, res) => {
+  try {
+    const results = {};
+    const tables = ['blog_posts', 'projects', 'skills', 'settings'];
+
+    for (const table of tables) {
+      const { error } = await supabase.from(table).select('id').limit(1);
+      results[table] = error ? { status: 'ERROR', message: error.message } : { status: 'OK' };
+    }
+
+    res.json({
+      supabase_url: process.env.SUPABASE_URL ? 'SET' : 'MISSING',
+      supabase_key_type: process.env.SUPABASE_KEY?.includes('anon') ? 'ANON (RLS needed)' : 'SERVICE_ROLE (RLS bypassed)',
+      table_diagnostics: results
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Ziyaretci sayaci (POST /api/stats/visit)
 app.post('/api/stats/visit', async (req, res) => {
   try {
     await supabase.rpc('increment_visits');
@@ -568,7 +601,7 @@ app.get('/api/stats', async (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
-    message: 'Aras Portfolio API calisıyor!',
+    message: 'Aras Portfolio API calisÄ±yor!',
     version: '1.0.0',
     endpoints: [
       'GET /api/spotify',
@@ -597,6 +630,7 @@ app.get('/', (req, res) => {
 // SUNUCUYU BASLAT
 // =============================================
 app.listen(PORT, () => {
-  console.log(`✅ Aras Portfolio API ${PORT} portunda calisiyor`);
-  console.log(`📡 http://localhost:${PORT}`);
+  console.log(`âœ… Aras Portfolio API ${PORT} portunda calisiyor`);
+  console.log(`ğŸ“¡ http://localhost:${PORT}`);
 });
+

@@ -326,6 +326,34 @@ async function typeWriter() {
         "Bir Hayalperest"
     ];
 
+    const mixFonts = [
+        "'Inter', sans-serif",
+        "'JetBrains Mono', monospace",
+        "'Courier New', monospace",
+        "'Press Start 2P', system-ui",
+        "'Dancing Script', cursive",
+        "'Orbitron', sans-serif",
+        "Verdana, sans-serif"
+    ];
+    let currentMixIndexHero = 0;
+    let currentMixIndexLogo = 0;
+    let isHeroMix = false;
+    let isLogoMix = false;
+
+    function applyLogoFont(font) {
+        const oldStyle = document.getElementById('dynamic-logo-font');
+        if (oldStyle) oldStyle.remove();
+
+        const styleTag = document.createElement('style');
+        styleTag.id = 'dynamic-logo-font';
+        styleTag.textContent = `
+            :root { --logo-font: ${font}; }
+            .glitch { font-family: ${font} !important; }
+            .glitch::before, .glitch::after { font-family: ${font} !important; }
+        `;
+        document.head.appendChild(styleTag);
+    }
+
     try {
         const res = await fetch(`${API_URL}/api/settings`);
         if (res.ok) {
@@ -334,23 +362,18 @@ async function typeWriter() {
                 texts = data.hero_titles;
             }
             // Apply hero (typing text) font
-            if (data.hero_font) {
+            if (data.hero_font === 'mix') {
+                isHeroMix = true;
+                textElement.style.fontFamily = mixFonts[currentMixIndexHero];
+            } else if (data.hero_font) {
                 textElement.style.fontFamily = data.hero_font;
             }
             // Apply logo font via CSS variable injection (affects glitch ::before/::after too)
-            if (data.logo_font) {
-                // Remove any previously injected font style
-                const oldStyle = document.getElementById('dynamic-logo-font');
-                if (oldStyle) oldStyle.remove();
-
-                const styleTag = document.createElement('style');
-                styleTag.id = 'dynamic-logo-font';
-                styleTag.textContent = `
-                    :root { --logo-font: ${data.logo_font}; }
-                    .glitch { font-family: ${data.logo_font} !important; }
-                    .glitch::before, .glitch::after { font-family: ${data.logo_font} !important; }
-                `;
-                document.head.appendChild(styleTag);
+            if (data.logo_font === 'mix') {
+                isLogoMix = true;
+                applyLogoFont(mixFonts[currentMixIndexLogo]);
+            } else if (data.logo_font) {
+                applyLogoFont(data.logo_font);
             }
         }
     } catch (e) {
@@ -381,6 +404,16 @@ async function typeWriter() {
             isDeleting = false;
             textIndex = (textIndex + 1) % texts.length;
             typingSpeed = 500;
+
+            // Cycle fonts if mix is active
+            if (isHeroMix) {
+                currentMixIndexHero = (currentMixIndexHero + 1) % mixFonts.length;
+                textElement.style.fontFamily = mixFonts[currentMixIndexHero];
+            }
+            if (isLogoMix) {
+                currentMixIndexLogo = (currentMixIndexLogo + 1) % mixFonts.length;
+                applyLogoFont(mixFonts[currentMixIndexLogo]);
+            }
         }
 
         setTimeout(type, typingSpeed);

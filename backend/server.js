@@ -487,6 +487,7 @@ app.get('/api/settings', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('settings')
+      .select('*')
       .eq('id', 1)
       .single();
 

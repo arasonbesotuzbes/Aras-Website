@@ -333,17 +333,24 @@ async function typeWriter() {
             if (data.hero_titles && data.hero_titles.length > 0) {
                 texts = data.hero_titles;
             }
+            // Apply hero (typing text) font
             if (data.hero_font) {
                 textElement.style.fontFamily = data.hero_font;
             }
+            // Apply logo font via CSS variable injection (affects glitch ::before/::after too)
             if (data.logo_font) {
-                const logo = document.querySelector('.logo .glitch');
-                if (logo) {
-                    logo.style.fontFamily = data.logo_font;
-                    // Apply to pseudo-elements too by setting a CSS variable if needed, 
-                    // but usually direct style on parent with font-family: inherit in CSS is better.
-                    document.documentElement.style.setProperty('--logo-font', data.logo_font);
-                }
+                // Remove any previously injected font style
+                const oldStyle = document.getElementById('dynamic-logo-font');
+                if (oldStyle) oldStyle.remove();
+
+                const styleTag = document.createElement('style');
+                styleTag.id = 'dynamic-logo-font';
+                styleTag.textContent = `
+                    :root { --logo-font: ${data.logo_font}; }
+                    .glitch { font-family: ${data.logo_font} !important; }
+                    .glitch::before, .glitch::after { font-family: ${data.logo_font} !important; }
+                `;
+                document.head.appendChild(styleTag);
             }
         }
     } catch (e) {

@@ -3,6 +3,10 @@ const API_URL = (typeof API_BASE !== 'undefined' ? API_BASE : '').replace(/\/+$/
 let progressInterval;
 let updateInterval;
 
+// Hatsune Miku Easter Egg State
+let mikuClickCount = 0;
+let mikuAudio = null;
+
 // Süreyi formatlama
 function formatDuration(durationMs) {
     const minutes = Math.floor(durationMs / 60000);
@@ -38,6 +42,39 @@ async function getSpotifyData() {
         document.getElementById('spotifyArtist').textContent = data.artist;
         document.getElementById('spotifyArtwork').src = data.artwork;
         document.getElementById('spotifyLink').href = data.url;
+
+        // --- Hatsune Miku Easter Egg ---
+        const artistEl = document.getElementById('spotifyArtist');
+        if (data.artist && data.artist.toLowerCase().includes('hatsune miku')) {
+            if (!artistEl.classList.contains('miku-active')) {
+                artistEl.classList.add('miku-active');
+                artistEl.onclick = function(e) {
+                    e.preventDefault();
+                    mikuClickCount++;
+                    
+                    if (mikuClickCount === 1) {
+                        // 1. T�klama: Profil resmini de�i�tir
+                        const profileImg = document.querySelector('.profile-image');
+                        if (profileImg) profileImg.src = 'miku.png';
+                    } else if (mikuClickCount === 2) {
+                        // 2. T�klama: Temay� Miku mavisine �evir
+                        document.documentElement.classList.add('miku-theme');
+                        // Matrix canvas rengini de de�i�tirmeyi zorla (iste�e ba�l�, sayfa yenilenince d�zelir)
+                    } else if (mikuClickCount >= 3) {
+                        // 3. ve sonras� T�klama: Miku sesini �al
+                        if (!mikuAudio) {
+                            mikuAudio = new Audio('miku.mp3');
+                        }
+                        mikuAudio.currentTime = 0;
+                        mikuAudio.play().catch(e => console.log('Audio error:', e));
+                    }
+                };
+            }
+        } else {
+            // Ba�ka �ark�ya ge�ince class ve event'i temizle
+            artistEl.classList.remove('miku-active');
+            artistEl.onclick = null;
+        }
 
         const totalMs = data.duration_ms;
         let currentMs = data.progress_ms;
@@ -126,7 +163,7 @@ function createMatrixEffect() {
         ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "#0F0";
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--primary-color").trim() || "#0F0";
         ctx.font = fontSize + "px monospace";
 
         for (let i = 0; i < drops.length; i++) {
@@ -1032,3 +1069,4 @@ document.addEventListener('DOMContentLoaded', function () {
  } ) ( ) ; 
   
  
+

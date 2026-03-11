@@ -3,7 +3,7 @@
 // Backend deploy sonrasi bu URL'yi guncelleyin!
 // =============================================
 //const API_BASE = 'https://aras-website.onrender.com';
-const API_BASE = 'https://aras-website.onrender.com';
+const API_BASE = 'http://localhost:3000';
 // Local test icin: const API_BASE = 'http://localhost:3000';
 
 // Seviye etiketleri (hala kullaniliyor)

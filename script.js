@@ -42,7 +42,6 @@ async function getSpotifyData() {
         document.getElementById('spotifyArtist').textContent = data.artist;
         document.getElementById('spotifyArtwork').src = data.artwork;
         document.getElementById('spotifyLink').href = data.url;
-
         // --- Hatsune Miku Easter Egg ---
         const artistEl = document.getElementById('spotifyArtist');
         if (data.artist && data.artist.toLowerCase().includes('hatsune miku')) {
@@ -53,15 +52,11 @@ async function getSpotifyData() {
                     mikuClickCount++;
                     
                     if (mikuClickCount === 1) {
-                        // 1. T�klama: Profil resmini de�i�tir
                         const profileImg = document.querySelector('.profile-image');
                         if (profileImg) profileImg.src = 'miku.png';
                     } else if (mikuClickCount === 2) {
-                        // 2. T�klama: Temay� Miku mavisine �evir
                         document.documentElement.classList.add('miku-theme');
-                        // Matrix canvas rengini de de�i�tirmeyi zorla (iste�e ba�l�, sayfa yenilenince d�zelir)
                     } else if (mikuClickCount >= 3) {
-                        // 3. ve sonras� T�klama: Miku sesini �al
                         if (!mikuAudio) {
                             mikuAudio = new Audio('miku.mp3');
                         }
@@ -71,10 +66,10 @@ async function getSpotifyData() {
                 };
             }
         } else {
-            // Ba�ka �ark�ya ge�ince class ve event'i temizle
             artistEl.classList.remove('miku-active');
             artistEl.onclick = null;
         }
+
 
         const totalMs = data.duration_ms;
         let currentMs = data.progress_ms;
@@ -1034,39 +1029,3 @@ document.addEventListener('DOMContentLoaded', function () {
         showNotification('Steam entegrasyonu aktif! Oyunlar sekmesine tıklayın.', 'info');
     }, 2000);
 });
- / *   M i k u   E a s t e r   E g g   L o g i c   * / 
- ( f u n c t i o n ( )   { 
-         l e t   m C o u n t   =   0 ; 
-         l e t   m T i m e o u t ; 
-         
-         d o c u m e n t . a d d E v e n t L i s t e n e r ( ' k e y d o w n ' ,   ( e )   = >   { 
-                 i f   ( e . k e y . t o L o w e r C a s e ( )   = = =   ' m ' )   { 
-                         m C o u n t + + ; 
-                         c l e a r T i m e o u t ( m T i m e o u t ) ; 
-                         
-                         i f   ( m C o u n t   = = =   6 )   { 
-                                 c o n s t   m i k u   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' m i k u - e a s t e r - e g g ' ) ; 
-                                 i f   ( m i k u )   { 
-                                         m i k u . s t y l e . d i s p l a y   =   ' f l e x ' ; 
-                                         s e t T i m e o u t ( ( )   = >   m i k u . c l a s s L i s t . a d d ( ' a c t i v e ' ) ,   1 0 0 ) ; 
-                                         
-                                         / /   H i d e   a f t e r   5   s e c o n d s 
-                                         s e t T i m e o u t ( ( )   = >   { 
-                                                 m i k u . c l a s s L i s t . r e m o v e ( ' a c t i v e ' ) ; 
-                                                 s e t T i m e o u t ( ( )   = >   m i k u . s t y l e . d i s p l a y   =   ' n o n e ' ,   8 0 0 ) ; 
-                                         } ,   5 0 0 0 ) ; 
-                                 } 
-                                 m C o u n t   =   0 ; 
-                         }   e l s e   { 
-                                 m T i m e o u t   =   s e t T i m e o u t ( ( )   = >   { 
-                                         m C o u n t   =   0 ; 
-                                 } ,   2 0 0 0 ) ; 
-                         } 
-                 }   e l s e   { 
-                         m C o u n t   =   0 ; 
-                 } 
-         } ) ; 
- } ) ( ) ; 
-  
- 
-
